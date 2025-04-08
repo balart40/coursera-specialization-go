@@ -1,0 +1,59 @@
+Why Moore’s Law Has Slowed Down / Stopped Being True
+In recent years, the exponential growth predicted by Moore’s Law has slowed dramatically due to several physical and technical limitations, including challenges in voltage scaling, power consumption, and transistor miniaturization.
+
+Key Limitations
+1. Transistor Size and Quantum Effects
+Modern transistors are now just a few nanometers wide, approaching the size of individual atoms.
+
+At this scale, quantum tunneling becomes significant — electrons can leak through barriers, leading to increased leakage current and unstable operation.
+
+This makes it harder to maintain predictable, low-power behavior at smaller sizes.
+
+2. Power and Heat Dissipation
+Dynamic power (the power used when transistors switch) is given by the equation: P = aCV*V*f
+
+
+To reduce dynamic power, engineers used voltage scaling — lowering the supply voltage 𝑉 — which significantly reduces power consumption,
+since power is proportional to the square of voltage.
+
+However:
+Voltage scaling has limits:
+
+Lowering voltage too much leads to reliability issues, such as noise margins shrinking.
+
+It also causes performance degradation because the threshold voltage (Vₜ) below which transistors stop working becomes harder to maintain.
+
+Leakage power becomes a bigger issue:
+
+Even when a transistor is "off," it can leak current — especially at small scales and low voltages.
+
+Voltage scaling cannot eliminate leakage power, which now forms a significant portion of total power consumption.
+
+3. Diminishing Performance Returns
+Adding more transistors doesn’t automatically lead to faster chips.
+
+There are bottlenecks in memory access, data transfer, and software inefficiencies.
+
+Modern improvements focus more on parallelism (e.g., multi-core processors) and architecture changes (e.g., chiplets, 3D stacking), rather than raw transistor count.
+
+4. Cost and Manufacturing Complexity
+Advanced nodes (e.g., 3nm, 2nm) require extreme ultraviolet lithography (EUV) and incredibly precise manufacturing.
+
+Costs for R&D, equipment, and fabrication have skyrocketed, making it hard for all but a few companies to stay competitive.
+
+5. Material and Physical Limits
+Silicon is reaching its limits. Researchers are exploring alternatives like graphene, carbon nanotubes, and new transistor designs (e.g., FinFETs, gate-all-around FETs).
+
+These are promising, but not yet ready to replace conventional CMOS at scale.
+
+Summary
+Limitation	Effect
+Quantum effects	Leakage current and unpredictability
+Voltage scaling limits	Can’t reduce power indefinitely due to noise and threshold constraints
+Leakage power	Grows as transistors shrink, not solved by voltage scaling
+Thermal limits	Heat buildup with dense circuits
+Economic costs	Skyrocketing R&D and manufacturing complexity
+Diminishing returns	Smaller transistors don't always mean better performance
+
+In conclusion, Moore’s Law has slowed down because we are hitting fundamental limits in physics, thermodynamics, and economics. While voltage scaling helped reduce power for a long time, it no longer offsets the challenges of leakage, heat, and transistor miniaturization. The future of computing will likely rely more on new architectures, materials, and paradigms (like quantum or neuromorphic computing) than just cramming more transistors onto chips.
+
