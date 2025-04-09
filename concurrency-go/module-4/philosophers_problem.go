@@ -83,42 +83,52 @@ type Philo struct {
 	id              int
 	leftCS, rightCS *ChopS
 	eaten           int
+	permitChan      chan struct{}
+	doneChan        chan struct{}
 }
 
 type Host struct {
-	chanBuff int
-	channel  chan *Philo
+	chanBuff    int
+	requestChan chan *Philo
 }
 
-func (host *Host) Authorise(wg *sync.WaitGroup) {
-	for {
-		if len(host.channel) == host.chanBuff {
-			<-host.channel
-			<-host.channel
+func (h *Host) Authorize() {
+	sem := make(chan struct{}, h.chanBuff) // Only 2 philosophers at a time
 
-			// Add delay
-			time.Sleep(500 * time.Millisecond)
-		}
+	for philo := range h.requestChan {
+		sem <- struct{}{} // acquire slot (waits if 2 philosophers already eating)
+
+		// Grant permission
+		go func(p *Philo) {
+			p.permitChan <- struct{}{} // notify philosopher to start
+
+			// Wait until they're done
+			<-p.doneChan
+
+			<-sem // release slot
+		}(philo)
 	}
 }
 
 func (p *Philo) eat(host *Host, wg *sync.WaitGroup) {
 	// We will eat 3 times
 	for i := 0; i < 3; i++ {
-		// small fix since philosphers were eating 4 times
-		host.channel <- p
-		if p.eaten < 3 {
-			p.leftCS.Lock()
-			p.rightCS.Lock()
+		host.requestChan <- p // Ask for permission
+		<-p.permitChan        // Wait until host says "go"
 
-			fmt.Printf("starting to eat %d\n", p.id)
-			p.eaten++
-			fmt.Printf("finishing eating %d\n", p.id)
+		// Lock chopsticks (order doesn't matter here)
+		p.leftCS.Lock()
+		p.rightCS.Lock()
 
-			p.rightCS.Unlock()
-			p.leftCS.Unlock()
-			wg.Done()
-		}
+		fmt.Printf("starting to eat %d\n", p.id)
+		time.Sleep(100 * time.Millisecond)
+		fmt.Printf("finishing eating %d\n", p.id)
+
+		p.rightCS.Unlock()
+		p.leftCS.Unlock()
+
+		p.doneChan <- struct{}{} // Notify host we're done
+		wg.Done()
 	}
 }
 
@@ -130,7 +140,7 @@ func main() {
 	var names []string = []string{"Plato", "Socrates", "Descartes",
 		"Aristotle", "Kant"}
 	host.chanBuff = channelBuffer
-	host.channel = make(chan *Philo, channelBuffer)
+	host.requestChan = make(chan *Philo, channelBuffer)
 
 	// Create 5 Chopsticks
 	CSticks := make([]*ChopS, 5)
@@ -142,13 +152,21 @@ func main() {
 	// Create Philosophers
 	philos := make([]*Philo, 5)
 	for i := 0; i < len(names); i++ {
-		philos[i] = &Philo{names[i], i + 1, CSticks[i], CSticks[(i+1)%len(names)], 0}
+		philos[i] = &Philo{
+			name:       names[i],
+			id:         i + 1,
+			leftCS:     CSticks[i],
+			rightCS:    CSticks[(i+1)%len(names)],
+			eaten:      0,
+			permitChan: make(chan struct{}),
+			doneChan:   make(chan struct{}),
+		}
 	}
 
 	//eat
 	wg.Add(numberOfMeals * len(philos))
 
-	go host.Authorise(&wg)
+	go host.Authorize()
 
 	for i := 0; i < len(philos); i++ {
 		go philos[i].eat(&host, &wg)
