@@ -113,8 +113,8 @@ func (p *Philo) eat(host *Host, wg *sync.WaitGroup) {
 
 			fmt.Printf("%v starting to eat \n", p.name)
 			p.eaten++
-			fmt.Printf("%v Eating\n", p.name)
-			fmt.Printf("%v finish to eat meal %d \n", p.name, i+1)
+			fmt.Printf("%v finishing eating \n", p.name)
+			
 			p.rightCS.Unlock()
 			p.leftCS.Unlock()
 			wg.Done()
