@@ -106,8 +106,8 @@ func (p *Philo) eat(host *Host, wg *sync.WaitGroup) {
 	// We will eat 3 times
 	for i := 0; i < 3; i++ {
 		// small fix since philosphers were eating 4 times
+		host.channel <- p
 		if p.eaten < 3 {
-			host.channel <- p
 			p.leftCS.Lock()
 			p.rightCS.Lock()
 
@@ -127,7 +127,8 @@ func main() {
 	var host Host
 	var channelBuffer int = 2
 	var numberOfMeals int = 3
-	var names []string = []string{"Plato", "Socrates", "Descartes", "Aristotle", "Kant"}
+	var names []string = []string{"Plato", "Socrates", "Descartes",
+		"Aristotle", "Kant"}
 	host.chanBuff = channelBuffer
 	host.channel = make(chan *Philo, channelBuffer)
 
@@ -140,8 +141,8 @@ func main() {
 
 	// Create Philosophers
 	philos := make([]*Philo, 5)
-	for i := 0; i < 5; i++ {
-		philos[i] = &Philo{names[i], i + 1, CSticks[i], CSticks[(i+1)%5], 0}
+	for i := 0; i < len(names); i++ {
+		philos[i] = &Philo{names[i], i + 1, CSticks[i], CSticks[(i+1)%len(names)], 0}
 	}
 
 	//eat
