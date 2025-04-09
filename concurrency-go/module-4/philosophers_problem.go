@@ -105,16 +105,19 @@ func (host *Host) Authorise(wg *sync.WaitGroup) {
 func (p *Philo) eat(host *Host, wg *sync.WaitGroup) {
 	// We will eat 3 times
 	for i := 0; i < 3; i++ {
-		host.channel <- p
-		p.leftCS.Lock()
-		p.rightCS.Lock()
+		// small fix since philosphers were eating 4 times
+		if p.eaten < 3 {
+			host.channel <- p
+			p.leftCS.Lock()
+			p.rightCS.Lock()
 
-		fmt.Printf("%v starting to eat \n", p.name)
-		fmt.Printf("%v Eating\n", p.name)
-		fmt.Printf("%v finish to eat meal %d \n", p.name, i+1)
-		p.rightCS.Unlock()
-		p.leftCS.Unlock()
-		wg.Done()
+			fmt.Printf("%v starting to eat \n", p.name)
+			fmt.Printf("%v Eating\n", p.name)
+			fmt.Printf("%v finish to eat meal %d \n", p.name, i+1)
+			p.rightCS.Unlock()
+			p.leftCS.Unlock()
+			wg.Done()
+		}
 	}
 }
 
